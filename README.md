@@ -152,3 +152,4 @@ nomina/
 ## 👨‍💻 Autor
 
 - **LF4bi4n** - [Perfil de GitHub](https://github.com/LF4bi4n)
+

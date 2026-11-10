@@ -1,0 +1,21 @@
+# Dependencias y temporales
+node_modules/
+vendor/
+*.log
+*.tmp
+*.bak
+
+# Entorno y credenciales locales
+.env
+.env.local
+
+# IDEs y Editores
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Archivos de Sistema Operativo
+Thumbs.db
+Desktop.ini
+.DS_Store

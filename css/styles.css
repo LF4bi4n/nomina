@@ -1,0 +1,701 @@
+/* ========================================================
+   SISTEMA DE NÓMINAS Y GESTIÓN DE PERSONAL
+   Archivo: css/styles.css
+   Diseño Moderno, Limpio, Minimalista y Responsivo (SaaS Style)
+   ======================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --primary-subtle: #eef2ff;
+    --secondary-color: #0ea5e9;
+    --dark-bg: #0f172a;
+    --dark-card: #1e293b;
+    --light-bg: #f8fafc;
+    --border-color: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-muted: #64748b;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --shadow-soft: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+    --shadow-hover: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--light-bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    letter-spacing: -0.01em;
+}
+
+/* --------------------------------------------------------
+   Navbar Principal Minimalista & Elevado
+   -------------------------------------------------------- */
+.navbar-custom {
+    background: #0f172a;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.6rem 0;
+}
+
+.navbar-brand-logo {
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    font-size: 1.05rem;
+}
+
+/* --------------------------------------------------------
+   Barra de Pestañas Unificada (Clean Segmented / Tab Bar)
+   -------------------------------------------------------- */
+.app-tabs-bar {
+    background: #ffffff;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    position: sticky;
+    top: 57px;
+    z-index: 1020;
+}
+
+.app-tabs-container {
+    display: flex;
+    gap: 0.25rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 0.25rem 0;
+}
+
+.app-tabs-container::-webkit-scrollbar {
+    display: none;
+}
+
+.app-tab-btn {
+    border: none;
+    background: transparent;
+    padding: 0.65rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #64748b;
+    border-radius: var(--radius-sm);
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.app-tab-btn:hover {
+    color: var(--text-primary);
+    background: #f1f5f9;
+}
+
+.app-tab-btn.active {
+    color: var(--primary-color);
+    background: #eef2ff;
+    font-weight: 600;
+}
+
+.app-tab-btn .badge-num {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    color: #475569;
+    font-size: 0.65rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-tab-btn.active .badge-num {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* --------------------------------------------------------
+   Cards Limpias & Modernas
+   -------------------------------------------------------- */
+.card-modern {
+    background: #ffffff;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-soft);
+    transition: box-shadow 0.2s ease;
+}
+
+.card-modern:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+.card-header-modern {
+    background: transparent;
+    border-bottom: 1px solid #f1f5f9;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-header-modern h5 {
+    font-size: 0.98rem;
+    font-weight: 700;
+    margin: 0;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* --------------------------------------------------------
+   Stat Cards (KPIs Minimalistas)
+   -------------------------------------------------------- */
+.stat-card {
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-soft);
+}
+
+.stat-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+}
+
+.stat-icon.primary { background: #eef2ff; color: var(--primary-color); }
+.stat-icon.success { background: #ecfdf5; color: var(--success); }
+.stat-icon.warning { background: #fffbeb; color: var(--warning); }
+.stat-icon.info { background: #f0f9ff; color: var(--secondary-color); }
+
+.stat-value {
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #0f172a;
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 0.2rem;
+}
+
+/* --------------------------------------------------------
+   Mini-Stepper Contextual (Solo para Ciclo de Nómina)
+   -------------------------------------------------------- */
+.payroll-flow-bar {
+    display: flex;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    gap: 0.5rem;
+    overflow-x: auto;
+}
+
+.payroll-flow-step {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #64748b;
+    white-space: nowrap;
+}
+
+.payroll-flow-step.active {
+    color: var(--primary-color);
+}
+
+.payroll-flow-step.completed {
+    color: var(--success);
+}
+
+.payroll-flow-step .step-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    color: #64748b;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.payroll-flow-step.active .step-dot {
+    background: var(--primary-color);
+    color: white;
+}
+
+.payroll-flow-step.completed .step-dot {
+    background: var(--success);
+    color: white;
+}
+
+.payroll-flow-arrow {
+    color: #cbd5e1;
+    font-size: 0.8rem;
+}
+
+/* --------------------------------------------------------
+   Header de Sección / Vista (Simple & Elegante)
+   -------------------------------------------------------- */
+.page-header-simple {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    gap: 0.75rem;
+}
+
+.page-header-simple h4 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.page-header-simple p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* --------------------------------------------------------
+   Reloj Checador Digital Elegante (Dark Card)
+   -------------------------------------------------------- */
+.clock-display-card {
+    background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+    color: #ffffff;
+    border-radius: var(--radius-md);
+    padding: 1.75rem 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.digital-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #38bdf8;
+    text-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+    line-height: 1.1;
+    margin-bottom: 0.2rem;
+}
+
+.digital-date {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+}
+
+.btn-clock-in {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.75rem 1.75rem;
+    border-radius: 999px;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.btn-clock-in:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    color: white;
+}
+
+/* --------------------------------------------------------
+   Status Badges Limpias
+   -------------------------------------------------------- */
+.badge-status {
+    padding: 0.25rem 0.65rem;
+    font-weight: 600;
+    font-size: 0.72rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.badge-status::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.badge-borrador {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+.badge-borrador::before { background-color: #94a3b8; }
+
+.badge-congelada {
+    background-color: #e0f2fe;
+    color: #0284c7;
+}
+.badge-congelada::before { background-color: #0284c7; }
+
+.badge-timbrada {
+    background-color: #ecfdf5;
+    color: #059669;
+}
+.badge-timbrada::before { background-color: #10b981; }
+
+.badge-dispersada {
+    background-color: #f5f3ff;
+    color: #7c3aed;
+}
+.badge-dispersada::before { background-color: #8b5cf6; }
+
+/* --------------------------------------------------------
+   Tablas Estilizadas y Claras
+   -------------------------------------------------------- */
+.table-custom {
+    margin-bottom: 0;
+    vertical-align: middle;
+}
+
+.table-custom thead th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.table-custom tbody td {
+    padding: 0.85rem 1rem;
+    font-size: 0.85rem;
+    color: #1e293b;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.table-custom tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* --------------------------------------------------------
+   Recibo CFDI 4.0 Modal & Imprimible
+   -------------------------------------------------------- */
+.recibo-cfdi {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: var(--radius-sm);
+    padding: 1.75rem;
+    box-shadow: var(--shadow-soft);
+    font-size: 0.82rem;
+    color: #1e293b;
+}
+
+.recibo-header {
+    border-bottom: 2px solid #0f172a;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.cfdi-uuid {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    background: #f1f5f9;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    color: #0f172a;
+    display: inline-block;
+    word-break: break-all;
+}
+
+.table-recibo {
+    width: 100%;
+    margin-bottom: 0.75rem;
+}
+
+.table-recibo th {
+    background: #f1f5f9;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.78rem;
+    border-bottom: 1px solid #cbd5e1;
+}
+
+.table-recibo td {
+    padding: 0.35rem 0.5rem;
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+.recibo-total-box {
+    background: #f8fafc;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid #e2e8f0;
+}
+
+.qr-placeholder {
+    width: 95px;
+    height: 95px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    color: #64748b;
+    text-align: center;
+    padding: 4px;
+}
+
+/* --------------------------------------------------------
+   Constancia Laboral Membretada
+   -------------------------------------------------------- */
+.constancia-paper {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 2.5rem 2rem;
+    font-family: 'Times New Roman', Times, serif;
+    color: #0f172a;
+    line-height: 1.6;
+    position: relative;
+}
+
+.constancia-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-30deg);
+    font-size: 4rem;
+    color: rgba(79, 70, 229, 0.04);
+    font-weight: 900;
+    pointer-events: none;
+}
+
+.constancia-header {
+    border-bottom: 2px solid #0f172a;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* --------------------------------------------------------
+   GraphQL Terminal & Message Broker
+   -------------------------------------------------------- */
+.graphql-terminal {
+    background: #0f172a;
+    color: #f8fafc;
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    border: 1px solid #334155;
+}
+
+.graphql-editor {
+    background: #1e293b;
+    color: #38bdf8;
+    border: 1px solid #334155;
+    border-radius: var(--radius-sm);
+    padding: 0.85rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    width: 100%;
+    min-height: 160px;
+    resize: vertical;
+}
+
+.graphql-output {
+    background: #020617;
+    color: #4ade80;
+    border: 1px solid #1e293b;
+    border-radius: var(--radius-sm);
+    padding: 0.85rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    max-height: 340px;
+    overflow-y: auto;
+}
+
+.event-broker-card {
+    border-left: 3px solid #8b5cf6;
+    background: #faf5ff;
+    border-radius: var(--radius-sm);
+    padding: 0.65rem 0.85rem;
+    margin-bottom: 0.4rem;
+    font-size: 0.8rem;
+}
+
+/* --------------------------------------------------------
+   Campana y Dropdown de Notificaciones
+   -------------------------------------------------------- */
+.notif-bell-btn {
+    position: relative;
+    color: #cbd5e1;
+    font-size: 1.15rem;
+    background: transparent;
+    border: none;
+    padding: 0.35rem 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.notif-bell-btn:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.notif-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 0.62rem;
+    padding: 0.15em 0.4em;
+    border-radius: 999px;
+    background: #ef4444;
+    color: white;
+}
+
+.notif-item {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.notif-item:hover {
+    background: #f8fafc;
+}
+
+.notif-item.unread {
+    background: #f0fdf4;
+    border-left: 3px solid #10b981;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #modalReciboPrintable, #modalReciboPrintable * {
+        visibility: visible;
+    }
+    #modalReciboPrintable {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    #modalConstanciaPrintable, #modalConstanciaPrintable * {
+        visibility: visible;
+    }
+    #modalConstanciaPrintable {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    .no-print {
+        display: none !important;
+    }
+}
+
+/* --------------------------------------------------------
+   Toast Notifications
+   -------------------------------------------------------- */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+/* --------------------------------------------------------
+   Weather Widget (OpenWeatherMap API)
+   -------------------------------------------------------- */
+.weather-card-emp {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #0369a1 100%);
+    color: #ffffff;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 24px rgba(2, 132, 199, 0.2);
+    overflow: hidden;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.weather-card-emp::after {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -15%;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.weather-metric-box {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-sm);
+    padding: 0.65rem 0.75rem;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.weather-metric-box:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.weather-icon-wrapper {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}

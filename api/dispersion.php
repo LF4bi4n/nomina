@@ -66,6 +66,42 @@ if ($method === 'GET') {
 
     // Si se solicita descarga directa de archivo Layout TXT / CSV para pasarela bancaria
     if ($format === 'txt' || $format === 'csv' || isset($_GET['download'])) {
+        // Verificar membresía: Plan Bronce restringe descarga directa
+        try {
+            $stmtPlan = $pdo->query("SELECT plan_actual FROM configuracion_sistema LIMIT 1");
+            $planActual = $stmtPlan->fetchColumn() ?: 'ORO';
+        } catch (Exception $e) {
+            $planActual = 'ORO';
+        }
+
+        if ($planActual === 'BRONCE') {
+            $payCoins = !empty($_GET['pay_coins']);
+            if (!$payCoins) {
+                header('Content-Type: application/json; charset=utf-8');
+                http_response_code(403);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'La descarga de layouts bancarios está restringida en el Plan Bronce. Mejora a Plan Plata/Oro o desbloquea este layout por 20 NóminaCoins 🪙.',
+                    'requiere_upgrade' => true,
+                    'costo_coins' => 20
+                ], JSON_UNESCAPED_UNICODE);
+                exit();
+            } else {
+                $uId = (int)$currentUser['id'];
+                $stB = $pdo->prepare("SELECT saldo FROM billetera_monedas WHERE usuario_id = ?");
+                $stB->execute([$uId]);
+                $saldo = (int)$stB->fetchColumn();
+                if ($saldo < 20) {
+                    header('Content-Type: application/json; charset=utf-8');
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'message' => 'Saldo insuficiente de NóminaCoins (se requieren 20 NC).'], JSON_UNESCAPED_UNICODE);
+                    exit();
+                }
+                $pdo->prepare("UPDATE billetera_monedas SET saldo = saldo - 20, total_gastado = total_gastado + 20 WHERE usuario_id = ?")->execute([$uId]);
+                $pdo->prepare("INSERT INTO transacciones_monedas (usuario_id, tipo, monto, concepto, categoria, saldo_anterior, saldo_posterior) VALUES (?, 'EGRESO', 20, 'Desbloqueo de Layout SPEI (Plan Bronce)', 'LAYOUT_SPEI', ?, ?)")->execute([$uId, $saldo, $saldo - 20]);
+            }
+        }
+
         $filename = "LAYOUT_DISPERSION_{$banco_convenio}_{$nomina['periodo']}_{$fechaLote}." . ($format === 'csv' ? 'csv' : 'txt');
         
         header('Content-Type: text/plain; charset=utf-8');

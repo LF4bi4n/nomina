@@ -132,6 +132,56 @@ if ($method === 'POST') {
         sendJsonResponse(true, 'Sesión finalizada con éxito.');
     }
 
+    // Cambio dinámico de rol en caliente (Selector Demo)
+    if ($action === 'switch_role_demo') {
+        $nuevoRol = strtoupper(trim($input['rol'] ?? ''));
+        if (!in_array($nuevoRol, ['ADMIN', 'RH', 'AUDITOR', 'EMPLEADO'])) {
+            sendJsonResponse(false, 'Rol demo no válido.', null, 400);
+        }
+
+        $stmtUser = $pdo->prepare("
+            SELECT u.id, u.email, u.rol, u.empleado_id, 
+                   e.nombre, e.puesto, e.departamento, e.salario_diario, e.cuenta_clabe, e.rfc, e.curp
+            FROM usuarios u
+            LEFT JOIN empleados e ON u.empleado_id = e.id
+            WHERE u.rol = ?
+            ORDER BY u.id ASC LIMIT 1
+        ");
+        $stmtUser->execute([$nuevoRol]);
+        $targetUser = $stmtUser->fetch();
+
+        if (!$targetUser) {
+            sendJsonResponse(false, 'No se encontró un usuario demo para el rol solicitado.', null, 404);
+        }
+
+        $_SESSION['usuario_id']  = (int)$targetUser['id'];
+        $_SESSION['email']       = $targetUser['email'];
+        $_SESSION['rol']         = $targetUser['rol'];
+        $_SESSION['empleado_id'] = $targetUser['empleado_id'] ? (int)$targetUser['empleado_id'] : null;
+        $_SESSION['nombre']      = $targetUser['nombre'] ?? 'Administrador General';
+
+        logAuditAction('SWITCH_ROLE_DEMO', 'usuarios', (int)$targetUser['id'], "Cambio interactivo de rol a {$targetUser['rol']} en modo demostración.");
+
+        $permisos = getPermisosPorRol($targetUser['rol']);
+
+        sendJsonResponse(true, "Rol cambiado exitosamente a {$targetUser['rol']} (Modo Demo).", [
+            'usuario' => [
+                'id'          => (int)$targetUser['id'],
+                'email'       => $targetUser['email'],
+                'rol'         => $targetUser['rol'],
+                'empleado_id' => $targetUser['empleado_id'] ? (int)$targetUser['empleado_id'] : null,
+                'nombre'      => $targetUser['nombre'] ?? 'Administrador General',
+                'puesto'      => $targetUser['puesto'] ?? 'Administrador',
+                'departamento'=> $targetUser['departamento'] ?? 'Sistemas',
+                'salario_diario' => $targetUser['salario_diario'] ? (float)$targetUser['salario_diario'] : 0.00,
+                'cuenta_clabe'=> $targetUser['cuenta_clabe'] ?? '',
+                'rfc'         => $targetUser['rfc'] ?? '',
+                'curp'        => $targetUser['curp'] ?? '',
+                'permisos'    => $permisos
+            ]
+        ]);
+    }
+
     $email = trim($input['email'] ?? '');
     $password = trim($input['password'] ?? '');
 

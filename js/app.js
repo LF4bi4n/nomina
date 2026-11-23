@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
 async function initApp() {
     startDigitalClock();
     loadClimaWidget(); // Inicializa widget y píldora de clima (OpenWeatherMap)
+    loadMembresiaData(); // Carga nivel de membresía (Bronce, Plata, Oro)
+    loadBilleteraCoinsData(); // Inicializa saldo de NóminaCoins 🪙
 
     try {
         const res = await fetch('api/auth.php', { method: 'GET' });
@@ -441,6 +443,11 @@ function handleLoginSuccess(user) {
     renderNavigationMenu(user.rol);
     loadNotificaciones();
     cargarProfactConfigModal();
+    loadMembresiaData();
+    loadBilleteraCoinsData();
+
+    // Resaltar rol activo en el modal demo
+    highlightActiveRoleDemo(user.rol);
 
     if (user.rol === 'ADMIN' || user.rol === 'RH' || user.rol === 'AUDITOR') {
         document.getElementById('viewAdminRH').classList.remove('d-none');
@@ -3223,5 +3230,382 @@ async function cancelarFacturaCFDI(facturaId, folioFiscal) {
         }
     } catch (err) {
         showToast('Error de comunicación al cancelar.', 'danger');
+    }
+}
+
+// ========================================================
+// 12. SERVICIO DE MEMBRESÍAS (BRONCE, PLATA, ORO) & NÓMINACOINS 🪙
+// ========================================================
+
+/**
+ * Resalta visualmente el rol activo en el selector demo
+ */
+function highlightActiveRoleDemo(rol) {
+    document.querySelectorAll('.role-select-card').forEach(c => c.classList.remove('active-role'));
+    const mapCards = {
+        'ADMIN': 'cardRoleAdmin',
+        'RH': 'cardRoleRH',
+        'AUDITOR': 'cardRoleAuditor',
+        'EMPLEADO': 'cardRoleEmpleado'
+    };
+    const activeId = mapCards[rol];
+    if (activeId && document.getElementById(activeId)) {
+        document.getElementById(activeId).classList.add('active-role');
+    }
+}
+
+/**
+ * Cambia el rol de usuario en caliente (Selector Demo)
+ */
+async function switchUserRoleDemo(rol) {
+    showToast(`Cambiando entorno a rol ${rol}...`, 'info');
+
+    try {
+        const res = await fetch('api/auth.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'switch_role_demo', rol: rol })
+        });
+        const data = await res.json();
+
+        if (data.success && data.data && data.data.usuario) {
+            showToast(data.message, 'success');
+            
+            // Cerrar modal demo si está abierto
+            const modalEl = document.getElementById('modalSelectorDemo');
+            if (modalEl) {
+                const modalInst = bootstrap.Modal.getInstance(modalEl);
+                if (modalInst) modalInst.hide();
+            }
+
+            handleLoginSuccess(data.data.usuario);
+        } else {
+            showToast(data.message || 'Error al cambiar de rol.', 'danger');
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('Error de comunicación al cambiar de rol.', 'danger');
+    }
+}
+
+/**
+ * Carga información de membresías y plan activo
+ */
+async function loadMembresiaData() {
+    try {
+        const res = await fetch('api/membresias.php');
+        const data = await res.json();
+
+        if (data.success && data.data) {
+            const plan = data.data.plan_actual || 'ORO';
+            const planInfo = data.data.plan_info;
+            AppState.planActual = plan;
+            AppState.planInfo = planInfo;
+
+            // 1. Actualizar Badge en Navbar
+            const navBadge = document.getElementById('badgeNavbarPlanTexto');
+            const navIcon = document.getElementById('badgeNavbarPlanIcon');
+            const modalPlanLabel = document.getElementById('lblPlanActivoModal');
+
+            if (navBadge) {
+                navBadge.textContent = plan;
+                navBadge.className = `badge font-monospace ${
+                    plan === 'ORO' ? 'plan-badge-oro' : (plan === 'PLATA' ? 'plan-badge-plata' : 'plan-badge-bronce')
+                }`;
+            }
+
+            if (navIcon) {
+                if (plan === 'ORO') navIcon.innerHTML = '<i class="bi bi-trophy-fill text-warning"></i>';
+                else if (plan === 'PLATA') navIcon.innerHTML = '<i class="bi bi-shield-shaded text-light"></i>';
+                else navIcon.innerHTML = '<i class="bi bi-award text-warning"></i>';
+            }
+
+            if (modalPlanLabel) {
+                modalPlanLabel.textContent = planInfo.nombre;
+                modalPlanLabel.className = `badge ${
+                    plan === 'ORO' ? 'plan-badge-oro' : (plan === 'PLATA' ? 'plan-badge-plata' : 'plan-badge-bronce')
+                } px-3 py-1 fs-6`;
+            }
+
+            // 2. Resaltar tarjeta activa en el modal
+            document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('active-plan'));
+            const cardMap = {
+                'BRONCE': 'cardPlanBronce',
+                'PLATA': 'cardPlanPlata',
+                'ORO': 'cardPlanOro'
+            };
+            const activeCardId = cardMap[plan];
+            if (activeCardId && document.getElementById(activeCardId)) {
+                document.getElementById(activeCardId).classList.add('active-plan');
+            }
+
+            // 3. Actualizar textos de los botones del modal de planes
+            document.querySelectorAll('.btn-switch-plan').forEach(btn => {
+                const p = btn.getAttribute('data-plan');
+                if (p === plan) {
+                    btn.className = 'btn btn-success w-100 fw-bold shadow-sm';
+                    btn.innerHTML = `<i class="bi bi-check-circle-fill me-1"></i> Plan Activo (${plan})`;
+                } else {
+                    btn.className = (p === 'ORO') ? 'btn btn-outline-warning text-dark w-100 fw-bold' : 'btn btn-outline-secondary w-100 fw-bold';
+                    btn.innerHTML = `Activar Plan ${p}`;
+                }
+            });
+
+            // 4. Adaptar advertencias y candados visuales según plan
+            aplicarRestriccionesVisualesPlan(plan);
+        }
+    } catch (err) {
+        console.error('Error al consultar membresías:', err);
+    }
+}
+
+/**
+ * Aplica avisos y restricciones visuales según el nivel de suscripción
+ */
+function aplicarRestriccionesVisualesPlan(plan) {
+    const btnLayout = document.getElementById('btnDescargarLayoutTxt');
+    if (btnLayout) {
+        if (plan === 'BRONCE') {
+            btnLayout.classList.remove('btn-success');
+            btnLayout.classList.add('btn-outline-warning');
+            btnLayout.innerHTML = '<i class="bi bi-lock-fill text-warning me-1"></i> Layout TXT (20 NC 🪙)';
+            btnLayout.title = 'Restringido en Plan Bronce. Desbloquear con 20 NóminaCoins o mejorar a Plata/Oro.';
+            btnLayout.onclick = (e) => {
+                e.preventDefault();
+                confirmarDesbloqueoLayoutBronce();
+            };
+        } else {
+            btnLayout.classList.remove('btn-outline-warning');
+            btnLayout.classList.add('btn-success');
+            btnLayout.innerHTML = '<i class="bi bi-download me-1"></i> Descargar Layout Oficial (.TXT)';
+            btnLayout.title = 'Descarga directa de layout bancario SPEI';
+            btnLayout.onclick = null;
+        }
+    }
+}
+
+/**
+ * Diálogo para desbloquear layout en Plan Bronce pagando con monedas
+ */
+function confirmarDesbloqueoLayoutBronce() {
+    if (!confirm('La descarga directa de layouts SPEI está restringida en el Plan Bronce.\n\n¿Deseas gastar 20 NóminaCoins 🪙 para desbloquear y descargar este layout bancario ahora mismo?')) {
+        return;
+    }
+
+    const banco = document.getElementById('selectConvenioBanco')?.value || 'UNIVERSAL';
+    if (!AppState.currentNominaId) {
+        showToast('Selecciona un periodo de nómina válido.', 'warning');
+        return;
+    }
+
+    const url = `api/dispersion.php?nomina_id=${AppState.currentNominaId}&banco=${banco}&download=1&format=txt&pay_coins=1`;
+    window.location.href = url;
+    setTimeout(() => {
+        loadBilleteraCoinsData();
+        showToast('Layout bancario desbloqueado (-20 NC).', 'success');
+    }, 1500);
+}
+
+/**
+ * Cambia el plan de membresía en caliente (Demo Switcher)
+ */
+async function switchMembershipPlan(plan) {
+    showToast(`Actualizando suscripción a Plan ${plan}...`, 'info');
+
+    try {
+        const res = await fetch('api/membresias.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ plan: plan })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            showToast(data.message, 'success');
+            await loadMembresiaData();
+            loadFacturasData();
+            loadBilleteraCoinsData();
+            
+            // Cerrar modal demo
+            const modalEl = document.getElementById('modalSelectorDemo');
+            if (modalEl) {
+                const modalInst = bootstrap.Modal.getInstance(modalEl);
+                if (modalInst) modalInst.hide();
+            }
+        } else {
+            showToast(data.message || 'Error al cambiar plan.', 'danger');
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('Error de comunicación con el servidor.', 'danger');
+    }
+}
+
+/**
+ * Carga el saldo de la billetera, catálogo de recompensas e historial de NóminaCoins
+ */
+async function loadBilleteraCoinsData() {
+    try {
+        const res = await fetch('api/monedas.php');
+        const data = await res.json();
+
+        if (data.success && data.data) {
+            const w = data.data;
+
+            // 1. Actualizar Navbar y Hero Modal
+            const navSaldo = document.getElementById('navCoinsSaldo');
+            const heroSaldo = document.getElementById('walletHeroSaldo');
+            const totalGanado = document.getElementById('walletTotalGanado');
+            const totalGastado = document.getElementById('walletTotalGastado');
+
+            if (navSaldo) navSaldo.textContent = w.saldo;
+            if (heroSaldo) heroSaldo.textContent = w.saldo;
+            if (totalGanado) totalGanado.textContent = `${w.total_ganado} NC`;
+            if (totalGastado) totalGastado.textContent = `${w.total_gastado} NC`;
+
+            // 2. Renderizar Catálogo de Recompensas y Beneficios
+            renderCatalogoRecompensas(w.catalogo || [], w.saldo);
+
+            // 3. Renderizar Historial de Transacciones
+            renderHistorialMonedas(w.transacciones || []);
+        }
+    } catch (err) {
+        console.error('Error al cargar billetera NóminaCoins:', err);
+    }
+}
+
+/**
+ * Renderiza tarjetas de la tienda de recompensas
+ */
+function renderCatalogoRecompensas(items, saldoActual) {
+    const container = document.getElementById('contenedorCatalogoMonedas');
+    if (!container) return;
+
+    document.getElementById('badgeTotalItemsTienda').textContent = `${items.length} disponibles`;
+
+    if (!items || items.length === 0) {
+        container.innerHTML = `<div class="col-12 text-center py-4 text-muted">No hay beneficios disponibles en este momento.</div>`;
+        return;
+    }
+
+    container.innerHTML = items.map(item => {
+        const puedeComprar = saldoActual >= item.precio_monedas;
+        return `
+            <div class="col-md-6 col-lg-4">
+                <div class="recompensa-card p-3 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge ${item.categoria === 'EMPRESA' ? 'bg-primary' : 'bg-success'} text-uppercase" style="font-size: 0.65rem;">
+                            ${escapeHtml(item.categoria)}
+                        </span>
+                        <span class="coin-price-tag">
+                            🪙 ${item.precio_monedas} NC
+                        </span>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <div class="p-2 rounded bg-${item.color || 'primary'} bg-opacity-10 text-${item.color || 'primary'} fs-5" style="width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;">
+                            <i class="bi ${escapeHtml(item.icono || 'bi-gift')}"></i>
+                        </div>
+                        <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.88rem;">${escapeHtml(item.titulo)}</h6>
+                    </div>
+
+                    <p class="text-muted small mb-3 flex-grow-1" style="font-size: 0.76rem; line-height: 1.4;">
+                        ${escapeHtml(item.descripcion)}
+                    </p>
+
+                    <button class="btn btn-sm ${puedeComprar ? 'btn-outline-primary' : 'btn-light text-muted border'} w-100 fw-semibold" 
+                            onclick="canjearRecompensa(${item.id}, '${escapeHtml(item.titulo)}', ${item.precio_monedas})"
+                            ${puedeComprar ? '' : 'title="Saldo insuficiente en tu billetera"'}>
+                        <i class="bi bi-bag-check me-1"></i> ${puedeComprar ? 'Canjear / Activar' : 'Requiere más NC'}
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+/**
+ * Renderiza la tabla de historial de transacciones de NóminaCoins
+ */
+function renderHistorialMonedas(transacciones) {
+    const tbody = document.getElementById('tablaHistorialMonedasBody');
+    if (!tbody) return;
+
+    if (!transacciones || transacciones.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">Aún no hay transacciones en tu billetera.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = transacciones.map(tx => {
+        const esIngreso = tx.tipo === 'INGRESO';
+        return `
+            <tr>
+                <td class="text-muted">${tx.fecha.substring(0, 16)}</td>
+                <td>
+                    <span class="badge ${esIngreso ? 'bg-success' : 'bg-danger'} text-uppercase" style="font-size: 0.65rem;">
+                        ${tx.tipo}
+                    </span>
+                </td>
+                <td class="fw-semibold text-dark">${escapeHtml(tx.concepto)}</td>
+                <td><span class="badge bg-light text-dark border">${escapeHtml(tx.categoria)}</span></td>
+                <td class="text-end fw-bold ${esIngreso ? 'text-success' : 'text-danger'}">
+                    ${esIngreso ? '+' : '-'}${tx.monto} NC
+                </td>
+                <td class="text-end font-monospace fw-bold text-dark">${tx.saldo_posterior} NC</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+/**
+ * Recarga monedas demo instantáneamente
+ */
+async function recargarMonedasDemo(monto) {
+    try {
+        const res = await fetch('api/monedas.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'recargar', monto: monto })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            showToast(data.message, 'success');
+            loadBilleteraCoinsData();
+        } else {
+            showToast(data.message || 'Error al recargar.', 'danger');
+        }
+    } catch (err) {
+        showToast('Error de comunicación.', 'danger');
+    }
+}
+
+/**
+ * Canjea o compra un servicio/beneficio con NóminaCoins
+ */
+async function canjearRecompensa(recompensaId, titulo, precio) {
+    if (!confirm(`¿Confirmas el canje de "${titulo}" por ${precio} NóminaCoins 🪙?`)) {
+        return;
+    }
+
+    try {
+        const res = await fetch('api/monedas.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'canjear', recompensa_id: recompensaId })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            showToast(data.message, 'success');
+            alert(`🎉 ¡Canje Exitoso!\n\nBeneficio: ${titulo}\nCódigo de Verificación SAT / RRHH: ${data.data?.codigo_canje || 'NC-OK'}\n\nSe descontaron ${precio} NóminaCoins de tu billetera.`);
+            loadBilleteraCoinsData();
+            loadNotificaciones();
+            loadAuditTrail();
+        } else {
+            showToast(data.message || 'No se pudo realizar el canje.', 'danger');
+        }
+    } catch (err) {
+        showToast('Error de comunicación al canjear.', 'danger');
     }
 }

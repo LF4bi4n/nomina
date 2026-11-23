@@ -260,12 +260,33 @@ if ($method === 'POST') {
 
     $nuevoId = (int)$pdo->lastInsertId();
 
+    // Recompensa gamificada de NóminaCoins por asistencia y puntualidad
+    $monedasGanadas = 0;
+    if ($tipo === 'ASISTENCIA' && !empty($currentUser['id'])) {
+        $monedasGanadas = 5;
+        try {
+            $uId = (int)$currentUser['id'];
+            $pdo->prepare("INSERT IGNORE INTO billetera_monedas (usuario_id, saldo, total_ganado, total_gastado) VALUES (?, 250, 250, 0)")->execute([$uId]);
+            $pdo->prepare("UPDATE billetera_monedas SET saldo = saldo + ?, total_ganado = total_ganado + ? WHERE usuario_id = ?")->execute([$monedasGanadas, $monedasGanadas, $uId]);
+            $stmtSal = $pdo->prepare("SELECT saldo FROM billetera_monedas WHERE usuario_id = ?");
+            $stmtSal->execute([$uId]);
+            $salAct = (int)$stmtSal->fetchColumn();
+            $pdo->prepare("INSERT INTO transacciones_monedas (usuario_id, tipo, monto, concepto, categoria, saldo_anterior, saldo_posterior) VALUES (?, 'INGRESO', ?, 'Bono de puntualidad: Asistencia checador GPS', 'PUNTUALIDAD', ?, ?)")->execute([$uId, $monedasGanadas, $salAct - $monedasGanadas, $salAct]);
+        } catch (Exception $e) {
+            // No bloquear marcaje si falla la billetera
+        }
+    }
+
     // Notificar a RH si fue una solicitud pendiente de empleado
     if ($estatus === 'PENDIENTE') {
         createNotification(1, $empleado_id, 'NUEVA_SOLICITUD', "Nueva Solicitud: {$tipo}", "El empleado ha enviado una solicitud de {$tipo} para la fecha {$fecha}.", 'PORTAL');
     }
 
-    sendJsonResponse(true, 'Registro de incidencia guardado correctamente.', [
+    $mensajeRes = ($monedasGanadas > 0) 
+        ? "¡Asistencia registrada con éxito! Has ganado +{$monedasGanadas} NóminaCoins 🪙 por puntualidad."
+        : 'Registro de incidencia guardado correctamente.';
+
+    sendJsonResponse(true, $mensajeRes, [
         'id'               => $nuevoId,
         'empleado_id'      => $empleado_id,
         'tipo'             => $tipo,
@@ -274,7 +295,8 @@ if ($method === 'POST') {
         'horas_extra'      => $horas_extra,
         'tipo_incapacidad' => $tipo_incapacidad,
         'folio_medico'     => $folio_medico,
-        'estatus'          => $estatus
+        'estatus'          => $estatus,
+        'monedas_ganadas'  => $monedasGanadas
     ], 201);
 }
 

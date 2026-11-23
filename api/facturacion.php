@@ -113,6 +113,21 @@ if ($method === 'POST') {
 
     // A) CREAR NUEVA FACTURA
     if ($action === 'crear') {
+        // Validar Plan de Membresía: Plan Bronce no permite facturación comercial
+        try {
+            $stmtPlan = $pdo->query("SELECT plan_actual FROM configuracion_sistema LIMIT 1");
+            $planActual = $stmtPlan->fetchColumn() ?: 'ORO';
+        } catch (Exception $e) {
+            $planActual = 'ORO';
+        }
+
+        if ($planActual === 'BRONCE') {
+            sendJsonResponse(false, 'El módulo de Facturación Comercial CFDI 4.0 está restringido en el Plan Bronce. Mejora tu membresía a Plan Plata u Oro para emitir facturas.', [
+                'requiere_upgrade' => true,
+                'plan_actual'      => 'BRONCE'
+            ], 403);
+        }
+
         $clienteNombre = trim($input['cliente_nombre'] ?? '');
         $clienteRfc    = strtoupper(trim($input['cliente_rfc'] ?? ''));
         $usoCfdi       = trim($input['cliente_uso_cfdi'] ?? 'G03');

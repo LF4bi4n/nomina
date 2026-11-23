@@ -313,3 +313,80 @@ CREATE TABLE IF NOT EXISTS `detalle_factura` (
     INDEX (`factura_id`),
     FOREIGN KEY (`factura_id`) REFERENCES `facturas`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- 12. TABLA: configuracion_sistema (Planes de Membresía: Bronce, Plata, Oro)
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `configuracion_sistema` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `plan_actual` ENUM('BRONCE', 'PLATA', 'ORO') NOT NULL DEFAULT 'ORO',
+    `nombre_empresa` VARCHAR(150) NOT NULL DEFAULT 'SISTEMA DE NOMINAS Y PERSONAL S.A. DE C.V.',
+    `rfc_empresa` VARCHAR(13) NOT NULL DEFAULT 'NOM210315AB1',
+    `limite_empleados_bronce` INT NOT NULL DEFAULT 5,
+    `limite_empleados_plata` INT NOT NULL DEFAULT 15,
+    `limite_empleados_oro` INT NOT NULL DEFAULT 9999,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT IGNORE INTO `configuracion_sistema` (`id`, `plan_actual`, `nombre_empresa`, `rfc_empresa`)
+VALUES (1, 'ORO', 'SISTEMA DE NOMINAS Y PERSONAL S.A. DE C.V.', 'NOM210315AB1');
+
+-- --------------------------------------------------------
+-- 13. TABLA: billetera_monedas (Billeteras Virtuales NóminaCoins 🪙)
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `billetera_monedas` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `usuario_id` INT NOT NULL UNIQUE,
+    `saldo` INT NOT NULL DEFAULT 250,
+    `total_ganado` INT NOT NULL DEFAULT 250,
+    `total_gastado` INT NOT NULL DEFAULT 0,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT `fk_billetera_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- 14. TABLA: transacciones_monedas (Historial de Ledger NóminaCoins)
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `transacciones_monedas` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `usuario_id` INT NOT NULL,
+    `tipo` ENUM('INGRESO', 'EGRESO') NOT NULL,
+    `monto` INT NOT NULL,
+    `concepto` VARCHAR(255) NOT NULL,
+    `categoria` VARCHAR(50) NOT NULL DEFAULT 'GENERAL',
+    `saldo_anterior` INT NOT NULL,
+    `saldo_posterior` INT NOT NULL,
+    `fecha` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT `fk_transacciones_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- 15. TABLA: catalogo_recompensas (Tienda de Servicios y Beneficios)
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `catalogo_recompensas` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `codigo` VARCHAR(50) NOT NULL UNIQUE,
+    `titulo` VARCHAR(150) NOT NULL,
+    `descripcion` TEXT NOT NULL,
+    `precio_monedas` INT NOT NULL,
+    `categoria` ENUM('EMPRESA', 'COLABORADOR') NOT NULL,
+    `icono` VARCHAR(50) NOT NULL DEFAULT 'bi-gift',
+    `color` VARCHAR(30) NOT NULL DEFAULT 'primary',
+    `activo` TINYINT(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- 16. TABLA: canjes_realizados (Registro de Canjes y Códigos)
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `canjes_realizados` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `usuario_id` INT NOT NULL,
+    `recompensa_id` INT NOT NULL,
+    `codigo_canje` VARCHAR(50) NOT NULL UNIQUE,
+    `precio_pagado` INT NOT NULL,
+    `detalles` TEXT NULL,
+    `estatus` ENUM('APLICADO', 'PENDIENTE', 'CANCELADO') NOT NULL DEFAULT 'APLICADO',
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT `fk_canje_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_canje_recompensa` FOREIGN KEY (`recompensa_id`) REFERENCES `catalogo_recompensas` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

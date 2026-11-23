@@ -122,6 +122,26 @@ $userEmail  = $_SESSION['email'] ?? '';
                         <span class="badge bg-info text-dark font-monospace" style="font-size: 0.65rem;" id="badgeNavbarPacAmbiente">SANDBOX</span>
                     </button>
 
+                    <!-- Plan de Membresía Actual (Bronce / Plata / Oro) -->
+                    <button class="btn btn-sm btn-outline-warning d-flex align-items-center gap-1 border-opacity-75 shadow-sm text-white" data-bs-toggle="modal" data-bs-target="#modalSelectorDemo" id="btnNavbarPlan" title="Ver nivel de plan (Bronce, Plata, Oro)">
+                        <span id="badgeNavbarPlanIcon"><i class="bi bi-trophy-fill text-warning"></i></span>
+                        <span class="d-none d-xl-inline small">Plan</span>
+                        <span class="badge plan-badge-oro font-monospace" style="font-size: 0.65rem;" id="badgeNavbarPlanTexto">ORO</span>
+                    </button>
+
+                    <!-- Billetera NóminaCoins (🪙 NC) -->
+                    <button class="btn btn-sm d-flex align-items-center gap-1 px-2 py-1 rounded-pill text-dark fw-bold border-0 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalBilleteraCoins" id="btnNavbarCoins" title="Billetera de NóminaCoins (🪙 NC)" style="background: linear-gradient(135deg, #fef08a 0%, #facc15 50%, #eab308 100%);">
+                        <span style="font-size: 0.95rem;">🪙</span>
+                        <span id="navCoinsSaldo" class="font-monospace">250</span>
+                        <span class="small" style="font-size: 0.65rem;">NC</span>
+                    </button>
+
+                    <!-- Botón Selector Demo (Rol & Plan) -->
+                    <button class="btn btn-sm btn-light d-flex align-items-center gap-1 fw-semibold text-dark border-0 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalSelectorDemo" id="btnSelectorDemo" title="Cambiar rol de usuario o membresía en modo demo">
+                        <i class="bi bi-person-gear text-primary"></i>
+                        <span class="d-none d-md-inline small">Selector Demo</span>
+                    </button>
+
                     <!-- Botón Mapa de Arquitectura -->
                     <button class="btn btn-sm btn-outline-light d-flex align-items-center gap-1 border-opacity-25" data-bs-toggle="modal" data-bs-target="#modalMapaServicios">
                         <i class="bi bi-diagram-3 text-warning"></i>
@@ -1747,6 +1767,343 @@ $userEmail  = $_SESSION['email'] ?? '';
                     <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">
                         <i class="bi bi-printer"></i> Imprimir Factura / Guardar PDF
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Selector Demo Interactivo (Roles y Membresías Bronce / Plata / Oro) -->
+    <div class="modal fade" id="modalSelectorDemo" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-dark text-white p-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="p-2 bg-primary rounded text-white" style="width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-person-gear"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title fw-bold mb-0">Selector de Entorno Demo: Rol &amp; Membresía</h5>
+                            <span class="small text-white-50">Prueba NóminaPay alternando roles y niveles de servicio en tiempo real.</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body p-4 bg-light">
+                    <!-- Nav Tabs del Selector Demo -->
+                    <ul class="nav nav-pills nav-fill mb-4 p-1 bg-white rounded shadow-sm border" id="demoSwitcherTabs">
+                        <li class="nav-item">
+                            <button class="nav-link active fw-bold py-2" data-bs-toggle="pill" data-bs-target="#tabDemoRoles">
+                                <i class="bi bi-people-fill me-1"></i> 1. Cambiar Rol de Usuario
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link fw-bold py-2" data-bs-toggle="pill" data-bs-target="#tabDemoPlanes">
+                                <i class="bi bi-trophy-fill me-1 text-warning"></i> 2. Planes de Servicio (Bronce, Plata, Oro)
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <!-- PESTAÑA 1: SELECTOR DE ROL -->
+                        <div class="tab-pane fade show active" id="tabDemoRoles">
+                            <div class="alert alert-info d-flex align-items-center gap-2 mb-3 py-2">
+                                <i class="bi bi-info-circle-fill fs-5"></i>
+                                <span class="small">Haz clic en cualquiera de los 4 perfiles para cambiar de identidad inmediatamente sin necesidad de ingresar contraseña.</span>
+                            </div>
+
+                            <div class="row g-3">
+                                <!-- Rol Admin -->
+                                <div class="col-md-6 col-lg-3">
+                                    <div class="role-select-card" id="cardRoleAdmin" onclick="switchUserRoleDemo('ADMIN')">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-primary text-uppercase px-2 py-1">ADMIN</span>
+                                            <i class="bi bi-shield-check text-primary fs-3"></i>
+                                        </div>
+                                        <h6 class="fw-bold mb-1">Administrador</h6>
+                                        <p class="text-muted small mb-2">admin@nominas.com</p>
+                                        <ul class="small text-muted ps-3 mb-3" style="font-size: 0.78rem;">
+                                            <li>Control total de todos los servicios</li>
+                                            <li>Timbrado fiscal y dispersión SPEI</li>
+                                            <li>Configuración de PAC y auditoría</li>
+                                        </ul>
+                                        <button type="button" class="btn btn-sm btn-outline-primary w-100 fw-semibold">
+                                            Seleccionar Admin
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Rol RH -->
+                                <div class="col-md-6 col-lg-3">
+                                    <div class="role-select-card" id="cardRoleRH" onclick="switchUserRoleDemo('RH')">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-info text-dark text-uppercase px-2 py-1">RH</span>
+                                            <i class="bi bi-people text-info fs-3"></i>
+                                        </div>
+                                        <h6 class="fw-bold mb-1">Recursos Humanos</h6>
+                                        <p class="text-muted small mb-2">rh@nominas.com</p>
+                                        <ul class="small text-muted ps-3 mb-3" style="font-size: 0.78rem;">
+                                            <li>Altas y expedientes de personal</li>
+                                            <li>Aprobación de incidencias y checador</li>
+                                            <li>Cálculo de nómina y ProFact</li>
+                                        </ul>
+                                        <button type="button" class="btn btn-sm btn-outline-info w-100 fw-semibold">
+                                            Seleccionar RH
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Rol Auditor -->
+                                <div class="col-md-6 col-lg-3">
+                                    <div class="role-select-card" id="cardRoleAuditor" onclick="switchUserRoleDemo('AUDITOR')">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-warning text-dark text-uppercase px-2 py-1">AUDITOR</span>
+                                            <i class="bi bi-search text-warning fs-3"></i>
+                                        </div>
+                                        <h6 class="fw-bold mb-1">Auditor Fiscal</h6>
+                                        <p class="text-muted small mb-2">auditor@nominas.com</p>
+                                        <ul class="small text-muted ps-3 mb-3" style="font-size: 0.78rem;">
+                                            <li>Solo lectura y auditoría estricta</li>
+                                            <li>Revisión de timbres y cálculos</li>
+                                            <li>Consulta de Audit Trail SAT</li>
+                                        </ul>
+                                        <button type="button" class="btn btn-sm btn-outline-warning text-dark w-100 fw-semibold">
+                                            Seleccionar Auditor
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Rol Empleado -->
+                                <div class="col-md-6 col-lg-3">
+                                    <div class="role-select-card" id="cardRoleEmpleado" onclick="switchUserRoleDemo('EMPLEADO')">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-success text-uppercase px-2 py-1">EMPLEADO</span>
+                                            <i class="bi bi-person-badge text-success fs-3"></i>
+                                        </div>
+                                        <h6 class="fw-bold mb-1">Colaborador</h6>
+                                        <p class="text-muted small mb-2">empleado@nominas.com</p>
+                                        <ul class="small text-muted ps-3 mb-3" style="font-size: 0.78rem;">
+                                            <li>Portal de autoconsulta personal</li>
+                                            <li>Checador GPS con recompensas 🪙</li>
+                                            <li>Descarga de recibos CFDI y clima</li>
+                                        </ul>
+                                        <button type="button" class="btn btn-sm btn-outline-success w-100 fw-semibold">
+                                            Seleccionar Empleado
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PESTAÑA 2: SELECTOR DE PLANES (BRONCE, PLATA, ORO) -->
+                        <div class="tab-pane fade" id="tabDemoPlanes">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h6 class="fw-bold mb-0">Nivel de Servicio Activo: <span class="badge" id="lblPlanActivoModal">ORO</span></h6>
+                                    <small class="text-muted">Cambia el plan para experimentar cómo se habilitan o restringen las funciones.</small>
+                                </div>
+                                <span class="badge bg-dark px-3 py-2 text-white"><i class="bi bi-lightning-charge text-warning"></i> Cambios en caliente</span>
+                            </div>
+
+                            <div class="row g-3">
+                                <!-- PLAN BRONCE -->
+                                <div class="col-lg-4">
+                                    <div class="plan-card plan-card-bronce p-4 h-100 d-flex flex-column" id="cardPlanBronce">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge plan-badge-bronce px-3 py-1 fs-6">BRONCE 🥉</span>
+                                            <span class="text-muted small">Gratuito</span>
+                                        </div>
+                                        <h5 class="fw-bold text-dark mb-1">Plan Emprendedor</h5>
+                                        <p class="text-muted small mb-3">Micronegocios y startups con nómina básica.</p>
+
+                                        <div class="p-2 bg-light rounded small mb-3 border">
+                                            <strong>Límite:</strong> Hasta 5 colaboradores
+                                        </div>
+
+                                        <ul class="list-unstyled small text-muted flex-grow-1 mb-4" style="line-height: 1.6;">
+                                            <li class="mb-2 text-success"><i class="bi bi-check-circle-fill me-2"></i> Hasta 5 empleados en nómina</li>
+                                            <li class="mb-2 text-success"><i class="bi bi-check-circle-fill me-2"></i> Cálculo fiscal de ISR e IMSS</li>
+                                            <li class="mb-2 text-success"><i class="bi bi-check-circle-fill me-2"></i> Checador de asistencias básico</li>
+                                            <li class="mb-2 text-danger"><i class="bi bi-x-circle-fill me-2"></i> Timbrado ProFact requiere 10 NC/recibo</li>
+                                            <li class="mb-2 text-danger"><i class="bi bi-x-circle-fill me-2"></i> Layouts bancarios SPEI bloqueados (20 NC)</li>
+                                            <li class="mb-2 text-danger"><i class="bi bi-x-circle-fill me-2"></i> Facturación comercial desactivada</li>
+                                            <li class="mb-2 text-danger"><i class="bi bi-x-circle-fill me-2"></i> Consola GraphQL y Broker desactivados</li>
+                                        </ul>
+
+                                        <button type="button" class="btn btn-outline-dark w-100 fw-bold btn-switch-plan" data-plan="BRONCE" onclick="switchMembershipPlan('BRONCE')">
+                                            Activar Plan Bronce
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- PLAN PLATA -->
+                                <div class="col-lg-4">
+                                    <div class="plan-card plan-card-plata p-4 h-100 d-flex flex-column" id="cardPlanPlata">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge plan-badge-plata px-3 py-1 fs-6">PLATA 🥈</span>
+                                            <span class="text-muted small fw-bold">$499 MXN / mes</span>
+                                        </div>
+                                        <h5 class="fw-bold text-dark mb-1">Plan Pyme Avanzada</h5>
+                                        <p class="text-muted small mb-3">Empresas en expansión con timbrado y dispersión.</p>
+
+                                        <div class="p-2 bg-light rounded small mb-3 border">
+                                            <strong>Límite:</strong> Hasta 15 colaboradores
+                                        </div>
+
+                                        <ul class="list-unstyled small text-muted flex-grow-1 mb-4" style="line-height: 1.6;">
+                                            <li class="mb-2 text-success"><i class="bi bi-check-circle-fill me-2"></i> Hasta 15 colaboradores en plantilla</li>
+                                            <li class="mb-2 text-success"><i class="bi bi-check-circle-fill me-2"></i> Timbrado ProFact incluido (30 timbres)</li>
+                                            <li class="mb-2 text-success"><i class="bi bi-check-circle-fill me-2"></i> Layouts bancarios SPEI habilitados</li>
+                                            <li class="mb-2 text-success"><i class="bi bi-check-circle-fill me-2"></i> Facturación comercial (hasta 10 facturas)</li>
+                                            <li class="mb-2 text-success"><i class="bi bi-check-circle-fill me-2"></i> Checador GPS y Clima OpenWeatherMap</li>
+                                            <li class="mb-2 text-success"><i class="bi bi-check-circle-fill me-2"></i> Auditoría completa (Audit Trail)</li>
+                                            <li class="mb-2 text-danger"><i class="bi bi-x-circle-fill me-2"></i> Consola GraphQL y Broker desactivados</li>
+                                        </ul>
+
+                                        <button type="button" class="btn btn-outline-secondary w-100 fw-bold btn-switch-plan" data-plan="PLATA" onclick="switchMembershipPlan('PLATA')">
+                                            Activar Plan Plata
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- PLAN ORO -->
+                                <div class="col-lg-4">
+                                    <div class="plan-card plan-card-oro p-4 h-100 d-flex flex-column active-plan" id="cardPlanOro">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge plan-badge-oro px-3 py-1 fs-6">ORO 🥇 VIP</span>
+                                            <span class="text-warning-emphasis small fw-bold">$1,299 MXN / mes</span>
+                                        </div>
+                                        <h5 class="fw-bold text-dark mb-1">Plan Corporativo Total</h5>
+                                        <p class="text-muted small mb-3">Acceso total a todos los servicios sin límites.</p>
+
+                                        <div class="p-2 rounded small mb-3 border border-warning" style="background: #fffbeb;">
+                                            <strong class="text-warning-emphasis">Todo ILIMITADO:</strong> Sin topes de personal
+                                        </div>
+
+                                        <ul class="list-unstyled small text-muted flex-grow-1 mb-4" style="line-height: 1.6;">
+                                            <li class="mb-2 text-success fw-semibold"><i class="bi bi-check-circle-fill me-2"></i> Colaboradores ILIMITADOS</li>
+                                            <li class="mb-2 text-success fw-semibold"><i class="bi bi-check-circle-fill me-2"></i> Timbrado ProFact ILIMITADO</li>
+                                            <li class="mb-2 text-success fw-semibold"><i class="bi bi-check-circle-fill me-2"></i> Facturación Comercial ILIMITADA</li>
+                                            <li class="mb-2 text-success fw-semibold"><i class="bi bi-check-circle-fill me-2"></i> Dispersión masiva SPEI multbanco</li>
+                                            <li class="mb-2 text-success fw-semibold"><i class="bi bi-check-circle-fill me-2"></i> Subgrafo GraphQL &amp; Broker en tiempo real</li>
+                                            <li class="mb-2 text-success fw-semibold"><i class="bi bi-check-circle-fill me-2"></i> Auditoría forense SAT de eventos</li>
+                                            <li class="mb-2 text-success fw-semibold"><i class="bi bi-check-circle-fill me-2"></i> +20% NóminaCoins extra al recargar</li>
+                                        </ul>
+
+                                        <button type="button" class="btn btn-warning w-100 fw-bold btn-switch-plan text-dark shadow-sm" data-plan="ORO" onclick="switchMembershipPlan('ORO')">
+                                            <i class="bi bi-trophy-fill me-1"></i> Plan Activo (Oro)
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light p-3">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Billetera Virtual NóminaCoins (🪙 NC) y Tienda de Beneficios -->
+    <div class="modal fade" id="modalBilleteraCoins" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header text-white p-3" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fs-3">🪙</span>
+                        <div>
+                            <h5 class="modal-title fw-bold mb-0">Billetera NóminaCoins (NC)</h5>
+                            <span class="small text-white-50">Moneda interna oficial de NóminaPay para servicios, certificaciones y recompensas.</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body p-4 bg-light">
+                    <!-- Tarjeta Hero de Saldo -->
+                    <div class="wallet-hero-card mb-4">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                            <div>
+                                <span class="text-white-50 small text-uppercase fw-semibold"><i class="bi bi-wallet2 me-1"></i> Saldo Disponible</span>
+                                <div class="d-flex align-items-baseline gap-2 mt-1">
+                                    <h1 class="display-4 fw-bold mb-0 text-warning" id="walletHeroSaldo">250</h1>
+                                    <span class="fs-4 text-warning-emphasis fw-bold">NC</span>
+                                </div>
+                                <div class="small text-white-50 mt-1">
+                                    Ganadas: <span class="text-white fw-semibold" id="walletTotalGanado">250 NC</span> &bull; 
+                                    Gastadas: <span class="text-white fw-semibold" id="walletTotalGastado">0 NC</span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-column gap-2 text-sm-end">
+                                <span class="text-white-50 small">Recarga rápida en Modo Demo:</span>
+                                <div class="btn-group shadow-sm">
+                                    <button class="btn btn-sm btn-outline-warning text-white fw-bold" onclick="recargarMonedasDemo(50)">+50 NC</button>
+                                    <button class="btn btn-sm btn-warning text-dark fw-bold" onclick="recargarMonedasDemo(100)">+100 NC</button>
+                                    <button class="btn btn-sm btn-outline-warning text-white fw-bold" onclick="recargarMonedasDemo(500)">+500 NC</button>
+                                </div>
+                                <span class="text-warning small" id="walletBonoOroMsg" style="font-size: 0.72rem;">
+                                    <i class="bi bi-star-fill"></i> ¡Bono VIP Oro: +20% adicional en recargas!
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pestañas de la Billetera -->
+                    <ul class="nav nav-tabs nav-fill mb-3" id="walletTabs">
+                        <li class="nav-item">
+                            <button class="nav-link active fw-bold" data-bs-toggle="tab" data-bs-target="#tabWalletTienda">
+                                <i class="bi bi-bag-check-fill me-1 text-primary"></i> Tienda de Servicios y Beneficios
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#tabWalletHistorial">
+                                <i class="bi bi-clock-history me-1 text-secondary"></i> Historial de Transacciones
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <!-- PESTAÑA: TIENDA DE RECOMPENSAS / SERVICIOS -->
+                        <div class="tab-pane fade show active" id="tabWalletTienda">
+                            <div class="alert alert-light border small text-muted py-2 mb-3 d-flex align-items-center justify-content-between">
+                                <span><i class="bi bi-lightbulb-fill text-warning me-1"></i> Puedes gastar tus NóminaCoins en servicios para la empresa o beneficios laborales para colaboradores.</span>
+                                <span class="badge bg-secondary" id="badgeTotalItemsTienda">9 disponibles</span>
+                            </div>
+
+                            <div class="row g-3" id="contenedorCatalogoMonedas">
+                                <!-- Dinámico -->
+                            </div>
+                        </div>
+
+                        <!-- PESTAÑA: HISTORIAL DE TRANSACCIONES -->
+                        <div class="tab-pane fade" id="tabWalletHistorial">
+                            <div class="table-responsive bg-white rounded border">
+                                <table class="table table-sm table-hover align-middle mb-0 small">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Tipo</th>
+                                            <th>Concepto</th>
+                                            <th>Categoría</th>
+                                            <th class="text-end">Monto</th>
+                                            <th class="text-end">Saldo Resultante</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaHistorialMonedasBody">
+                                        <!-- Dinámico -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light p-3">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>

@@ -1,4 +1,4 @@
-# 💼 NóminaPay - Sistema Integral de Nóminas, Facturación CFDI 4.0 & Portal del Empleado
+#NóminaPay - Sistema Integral de Nóminas, Facturación CFDI 4.0 & Portal del Empleado
 
 Sistema modular empresarial de gestión de capital humano, cálculo automatizado de nóminas mexicanas (ISR, IMSS, Infonavit), timbrado fiscal digital CFDI 4.0 con PAC ProFact, facturación electrónica, dispersión bancaria SPEI, auditoría de cambios y portal de autoconsulta para empleados con checador GPS y clima en tiempo real (OpenWeatherMap).
 
@@ -11,7 +11,7 @@ Sistema modular empresarial de gestión de capital humano, cálculo automatizado
 
 ---
 
-## 🚀 Características y Servicios Principales
+## Características y Servicios Principales
 
 1. **HR Core & Expedientes Laborales**:
    - Catálogo de colaboradores, puestos, departamentos, RFC, CURP, NSS, cuentas CLABE y salarios diarios/integrados.
@@ -61,7 +61,7 @@ Sistema modular empresarial de gestión de capital humano, cálculo automatizado
 
 ---
 
-## 📂 Estructura del Proyecto
+##  Estructura del Proyecto
 
 ```text
 nomina/
@@ -95,7 +95,7 @@ nomina/
 
 ---
 
-## 🛠️ Instalación y Configuración Local
+##  Instalación y Configuración Local
 
 ### Requisitos
 - **PHP** >= 8.1 (con extensiones `pdo_mysql`, `curl`, `json`, `mbstring`, `soap` habilitadas).
@@ -138,7 +138,7 @@ nomina/
 
 ---
 
-## 🔑 Credenciales de Acceso Demo
+##  Credenciales de Acceso Demo
 
 | Rol | Correo Electrónico | Contraseña | Permisos |
 | :--- | :--- | :--- | :--- |
@@ -149,7 +149,7 @@ nomina/
 
 ---
 
-## 👨‍💻 Autor
+## Autor
 
 - **LF4bi4n** - [Perfil de GitHub](https://github.com/LF4bi4n)
 
